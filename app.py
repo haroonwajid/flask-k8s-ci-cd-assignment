@@ -1,0 +1,19 @@
+from flask import Flask, jsonify
+
+app = Flask(__name__)
+
+
+@app.route('/')
+def hello_world():
+    """A basic Hello, World! endpoint"""
+    return jsonify(message="Hello, World!")
+
+
+@app.route('/health')
+def health_check():
+    """Health check endpoint"""
+    return jsonify(status="healthy"), 200
+
+
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=5000, debug=True)
