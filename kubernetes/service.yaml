@@ -1,0 +1,67 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: flask-app-service
+  namespace: default
+  labels:
+    app: flask-app
+  annotations:
+    description: "Service for load balancing Flask application traffic"
+spec:
+  # Service type for external access via NodePort
+  type: NodePort
+  
+  # Selects pods with these labels
+  selector:
+    app: flask-app
+  
+  # Port mappings
+  ports:
+  - name: http
+    # Port on the service
+    port: 80
+    # Port on the pod/container
+    targetPort: 5000
+    # Protocol
+    protocol: TCP
+    # Node port (external port) - range 30000-32767
+    # If not specified, Kubernetes will assign one automatically
+    nodePort: 30080
+  
+  # Session affinity for client connections
+  sessionAffinity: None
+  
+  # Session timeout (used if sessionAffinity is set)
+  sessionAffinityConfig:
+    clientIP:
+      timeoutSeconds: 10800
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: flask-app-cluster-ip
+  namespace: default
+  labels:
+    app: flask-app
+  annotations:
+    description: "ClusterIP service for internal pod-to-pod communication"
+spec:
+  # ClusterIP service for internal cluster communication
+  type: ClusterIP
+  
+  # Selects pods with these labels
+  selector:
+    app: flask-app
+  
+  # Port mappings
+  ports:
+  - name: http
+    port: 8000
+    targetPort: 5000
+    protocol: TCP
+  
+  # IP address allocation
+  ipFamilies:
+  - IPv4
+  ipFamilyPolicy: SingleStack
